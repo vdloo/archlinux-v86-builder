@@ -3,6 +3,15 @@ archlinux-v86
 
 This repo contains scripts to create an archlinux-x86 image for use with [v86](https://github.com/copy/v86/).
 
+
+## Requirements
+
+You need to have installed:
+
+1. packer
+2. kpartx
+3. qemu
+
 ## Usage
 
 1. Build the image
