@@ -20,7 +20,7 @@
       ],
       "headless": true,
       "boot_wait": "10s",
-      "disk_size": 1536,
+      "disk_size": 1024,
       "disk_interface": "ide",
       "http_directory": "http",
       "iso_url": "https://mirror.archlinux32.org/archisos/archlinux-2017.04.01-i686.iso",
