@@ -16,15 +16,48 @@ genfstab -p /mnt >> /mnt/etc/fstab
 
 echo "Ensuring root autologin on tty1"
 mkdir -p /mnt/etc/systemd/system/getty@tty1.service.d
-cat << EOF > /mnt/etc/systemd/system/getty@tty1.service.d/override.conf
+cat << 'EOF' > /mnt/etc/systemd/system/getty@tty1.service.d/override.conf
 [Service]
 ExecStart=
 ExecStart=-/usr/bin/agetty --autologin root --noclear %I $TERM
 EOF
 
+echo "Ensuring root is remounted using 9p after reboot"
+mkdir -p /mnt/etc/initcpio/hooks
+cat << 'EOF' > /mnt/etc/initcpio/hooks/9p_root
+run_hook() {
+    mount_handler="mount_9p_root"
+}
+
+mount_9p_root() {
+    msg ":: mounting '$root' on real root (9p)"
+    if ! mount -t 9p "$root" "$1"; then
+        echo "You are now being dropped into an emergency shell."
+        launch_interactive_shell
+        msg "Trying to continue (this will most likely fail) ..."
+    fi
+}
+EOF
+
+echo "Adding initcpio build hook for 9p root remount"
+mkdir -p /mnt/etc/initcpio/install
+cat << 'EOF' > /mnt/etc/initcpio/install/9p_root
+#!/bin/bash
+build() {
+	add_runscript
+}
+EOF
+
+echo "Configure mkinitcpio for 9p"
+sed -i 's/MODULES=""/MODULES="virtio_pci 9p 9pnet 9pnet_virtio atkbd i8042"/g' /mnt/etc/mkinitcpio.conf
+sed -i 's/fsck"/fsck 9p_root"/g' /mnt/etc/mkinitcpio.conf
+
 echo "Writing the installation script"
-cat << EOF > /mnt/bootstrap.sh
+cat << 'EOF' > /mnt/bootstrap.sh
 #!/usr/bin/bash
+echo "Re-generate initial ramdisk environment"
+mkinitcpio -p linux
+
 echo "Installing the grub package"
 pacman -S os-prober grub --noconfirm
 
