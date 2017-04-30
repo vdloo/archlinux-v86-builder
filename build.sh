@@ -26,9 +26,10 @@ sudo mount /dev/mapper/loop0p1 diskmount
 mkdir -p output/images
 
 # map the filesystem to json with fs2json
-# sudo python fs2json.py --exclude /boot/ --out output/images/fs.json diskmount
+sudo python resources/fs2json.py --exclude /boot/ --out output/images/fs.json diskmount
 
 # copy the filesystem and chown to nonroot user
+echo "Copying the filesystem to output/arch"
 mkdir output/arch -p
 sudo rsync -q -av diskmount/ output/arch
 sudo chown -R $(whoami):$(whoami) output/arch

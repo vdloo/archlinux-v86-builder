@@ -3,3 +3,4 @@
 *.swp
 packer/packer_cache
 packer/output-qemu
+output
