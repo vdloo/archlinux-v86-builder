@@ -19,7 +19,7 @@ echo "Mount the package cache dir in memory so it doesn't fill up the image"
 mount -t tmpfs none /mnt/var/cache/pacman/pkg
 
 echo "Performing pacstrap"
-pacstrap -i /mnt base --noconfirm
+pacstrap -i /mnt base linux --noconfirm
 
 echo "Writing fstab"
 genfstab -p /mnt >> /mnt/etc/fstab
